@@ -21,9 +21,8 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoURI;
 import com.mongodb.hadoop.input.MongoInputSplit;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import org.apache.commons.logging.Log;
@@ -48,7 +47,7 @@ public abstract class MongoCollectionSplitter extends MongoSplitter {
     public static final MinKey MIN_KEY_TYPE = new MinKey();
     public static final MaxKey MAX_KEY_TYPE = new MaxKey();
     //CHECKSTYLE:OFF
-//    protected Mongo mongo;
+//    protected MongoClient mongo;
 //    protected DBCollection inputCollection;
 
     //A reference to the database that we authenticated against, if there was
@@ -99,7 +98,7 @@ public abstract class MongoCollectionSplitter extends MongoSplitter {
     }
 
     protected DB getConfigDB() {
-        Mongo mongo;
+        MongoClient mongo;
         MongoClientURI inputURI = MongoConfigUtil.getInputURI(getConfiguration());
         MongoClientURI authURI = MongoConfigUtil.getAuthURI(getConfiguration());
 
@@ -113,7 +112,7 @@ public abstract class MongoCollectionSplitter extends MongoSplitter {
         }
 
         DB db = inputCollection.getDB();
-        mongo = db.getMongo();
+        mongo = db.getMongoClient();
         if (authURI != null) {
             if (authURI.getUsername() != null
                 && authURI.getPassword() != null) {
@@ -138,7 +137,7 @@ public abstract class MongoCollectionSplitter extends MongoSplitter {
     protected static MongoClientURI rewriteURI(
       final MongoClientURI originalUri, final List<String> newServerUris) {
         String originalUriString = originalUri.toString();
-        originalUriString = originalUriString.substring(MongoURI.MONGODB_PREFIX.length());
+        originalUriString = originalUriString.substring("mongodb://".length());
 
         // uris look like: mongodb://fred:foobar@server1[,server2]/path?options
         //
@@ -159,7 +158,7 @@ public abstract class MongoCollectionSplitter extends MongoSplitter {
         }
         sb.replace(serverStart, serverEnd,
           joinedHosts.substring(0, joinedHosts.length() - 1));
-        return new MongoClientURI(MongoURI.MONGODB_PREFIX + sb);
+        return new MongoClientURI("mongodb://" + sb);
     }
 
     protected static MongoClientURI rewriteURI(

@@ -105,13 +105,13 @@ def stopAll(signal) {
     stopService(signal, 'TaskTracker', 'task tracker')
 }
 
-task shutdownCluster() << {
+task shutdownCluster() { doLast {
     println "shutdownCluster"
     stopAll('TERM')
     stopAll('KILL')
-}
+} }
 
-task startCluster(dependsOn: [copyFiles]) << {
+task startCluster(dependsOn: [copyFiles]) { doLast {
     if (!file("${rootDir}/build/logs/").isDirectory()) {
         file("${rootDir}/build/logs/").mkdirs()
     }
@@ -133,9 +133,9 @@ task startCluster(dependsOn: [copyFiles]) << {
     } else {
         startYarn()
     }
-}
+} }
 
-task historicalYield(dependsOn: startCluster) << {
+task historicalYield(dependsOn: startCluster) { doLast {
 
     exec() {
         commandLine mongoimport, "-d", "mongo_hadoop", "-c", "yield_historical.in", "--drop",
@@ -147,18 +147,18 @@ task historicalYield(dependsOn: startCluster) << {
             "mongo.input.uri=mongodb://localhost:27017/mongo_hadoop.yield_historical.in",
             "mongo.output.uri=mongodb://localhost:27017/mongo_hadoop.yield_historical.out"
     ])
-}
+} }
 
-task sensorData(dependsOn: 'startCluster') << {
+task sensorData(dependsOn: 'startCluster') { doLast {
     hadoop("examples/sensors/build/libs/sensors-${project(':core').version}.jar",
            "com.mongodb.hadoop.examples.sensors.Devices", [])
 
     hadoop("examples/sensors/build/libs/sensors-${project(':core').version}.jar",
            "com.mongodb.hadoop.examples.sensors.Logs", ["io.sort.mb=100"])
-}
+} }
 
 
-task enronEmails(dependsOn: [downloadEnronEmails, startCluster]) << {
+task enronEmails(dependsOn: [downloadEnronEmails, startCluster]) { doLast {
     // Create BSON file input directory.
     exec() {
         commandLine "${hadoopHome}/bin/hdfs", "dfs", "-mkdir", "-p", "/messages"
@@ -172,9 +172,9 @@ task enronEmails(dependsOn: [downloadEnronEmails, startCluster]) << {
     // MR job
     hadoop("examples/enron/build/libs/enron-${project(':core').version}.jar",
            "com.mongodb.hadoop.examples.enron.EnronMail", [])
-}
+} }
 
-task shakespeare(dependsOn: [downloadShakespeare, startCluster]) << {
+task shakespeare(dependsOn: [downloadShakespeare, startCluster]) { doLast {
     // Split up complete works by title and upload to GridFS.
     def filePath = new File(System.properties['java.io.tmpdir'], "pg100.txt")
     hadoop("examples/shakespeare/build/libs/shakespeare-${project(':core').version}.jar",
@@ -185,7 +185,7 @@ task shakespeare(dependsOn: [downloadShakespeare, startCluster]) << {
     // MR job
     hadoop("examples/shakespeare/build/libs/shakespeare-${project(':core').version}.jar",
             "com.mongodb.hadoop.examples.shakespeare.Shakespeare", [])
-}
+} }
 
 def hadoop(jar, className, args, commandArgs = []) {
     def line = ["${hadoopHome}/bin/hadoop",

@@ -63,7 +63,7 @@ public class MongoPaginatingSplitterTest {
         assertSplitRange((MongoInputSplit) splits.get(5), 31000, 36000);
         assertSplitRange((MongoInputSplit) splits.get(6), 36000, null);
         // 6000 documents excluded by query.
-        assertSplitsCount(collection.count() - 6000, splits);
+        assertSplitsCount(collection.countDocuments() - 6000, splits);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class MongoPaginatingSplitterTest {
             Integer max = i == splits.size() - 1 ? null : (i + 1) * 5000;
             assertSplitRange((MongoInputSplit) splits.get(i), min, max);
         }
-        assertSplitsCount(collection.count(), splits);
+        assertSplitsCount(collection.countDocuments(), splits);
     }
 
 }

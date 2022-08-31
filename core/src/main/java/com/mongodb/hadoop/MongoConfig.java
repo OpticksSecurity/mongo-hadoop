@@ -19,7 +19,6 @@ package com.mongodb.hadoop;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoURI;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -187,10 +186,6 @@ public class MongoConfig {
         return MongoConfigUtil.getInputCollection(configuration);
     }
 
-    public void setMongoURI(final String key, final MongoURI value) {
-        setMongoURI(key, new MongoClientURI(value.toString()));
-    }
-
     public void setMongoURI(final String key, final MongoClientURI value) {
         MongoConfigUtil.setMongoURI(configuration, key, value);
     }
@@ -200,16 +195,6 @@ public class MongoConfig {
     }
 
     public void setInputURI(final String uri) {
-        MongoConfigUtil.setInputURI(configuration, uri);
-    }
-
-    /**
-     * @deprecated use {@link #setInputURI(MongoClientURI)} instead
-     * @param uri the input URI
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public void setInputURI(final MongoURI uri) {
         MongoConfigUtil.setInputURI(configuration, uri);
     }
 
@@ -230,16 +215,6 @@ public class MongoConfig {
     }
 
     public void setOutputURI(final String uri) {
-        MongoConfigUtil.setOutputURI(configuration, uri);
-    }
-
-    /**
-     * @deprecated use {@link #setOutputURI(MongoClientURI)} instead.
-     * @param uri the output URI.
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")    
-    public void setOutputURI(final MongoURI uri) {
         MongoConfigUtil.setOutputURI(configuration, uri);
     }
 

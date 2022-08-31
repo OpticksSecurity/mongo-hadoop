@@ -63,6 +63,6 @@ public class TablePropertiesTest extends HiveTest {
 
         execute(
           "INSERT INTO props_file_test VALUES ('55d5005b6e32ab5664606195', 42)");
-        assertEquals(2, collection.count(new Document("i", 42)));
+        assertEquals(2, collection.countDocuments(new Document("i", 42)));
     }
 }

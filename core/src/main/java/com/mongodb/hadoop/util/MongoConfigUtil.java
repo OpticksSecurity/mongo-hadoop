@@ -20,10 +20,8 @@ package com.mongodb.hadoop.util;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoURI;
 import com.mongodb.hadoop.splitter.MongoSplitter;
 import com.mongodb.hadoop.splitter.SampleSplitter;
 import com.mongodb.util.JSON;
@@ -417,23 +415,6 @@ public final class MongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #getMongoClientURI(Configuration, String)} instead
-     * @param conf the Configuration
-     * @param key the key for the setting
-     * @return the MongoURI stored for the given key
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static MongoURI getMongoURI(final Configuration conf, final String key) {
-        final String raw = conf.get(key);
-        if (raw != null && !raw.trim().isEmpty()) {
-            return new MongoURI(raw);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Retrieve a setting as a {@code MongoClientURI}.
      * @param conf the Configuration
      * @param key the key for the setting
@@ -465,16 +446,6 @@ public final class MongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #getCollection(MongoClientURI)}
-     * @param uri the MongoDB URI
-     * @return the DBCollection in the URI
-     */
-    @Deprecated
-    public static DBCollection getCollection(final MongoURI uri) {
-        return getCollection(new MongoClientURI(uri.toString()));
-    }
-
-    /**
      * Retrieve a DBCollection from a MongoDB URI.
      * @param uri the MongoDB URI
      * @return the DBCollection in the URI
@@ -485,19 +456,6 @@ public final class MongoConfigUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException("Couldn't connect and authenticate to get collection", e);
         }
-    }
-
-    /**
-     * @deprecated use {@link #getCollectionWithAuth(MongoClientURI, MongoClientURI)} instead
-     * @param authURI the URI with which to authenticate
-     * @param uri the MongoDB URI
-     * @return the authenticated DBCollection
-     */
-    @Deprecated
-    public static DBCollection getCollectionWithAuth(final MongoURI uri, final MongoURI authURI) {
-        return getCollectionWithAuth(
-          new MongoClientURI(uri.toString()),
-          new MongoClientURI(authURI.toString()));
     }
 
     /**
@@ -514,7 +472,7 @@ public final class MongoConfigUtil {
 
         DBCollection coll;
         try {
-            Mongo mongo = getMongoClient(authURI);
+            MongoClient mongo = getMongoClient(authURI);
             coll = mongo.getDB(uri.getDatabase()).getCollection(uri.getCollection());
             return coll;
         } catch (Exception e) {
@@ -537,18 +495,6 @@ public final class MongoConfigUtil {
             throw new IllegalArgumentException(
                                                   "Unable to connect to MongoDB Input Collection at '" + getInputURI(conf) + "'", e);
         }
-    }
-
-    /**
-     * @deprecated use {@link #setMongoURI(Configuration, String, MongoClientURI)} instead
-     * @param conf the Configuration
-     * @param key the key for the setting
-     * @param value the value for the setting
-     */
-    @Deprecated
-    public static void setMongoURI(final Configuration conf, final String key, final MongoURI value) {
-        conf.set(key, value.toString()); // todo - verify you can toString a
-        // URI object
     }
 
     /**
@@ -575,17 +521,6 @@ public final class MongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #setInputURI(Configuration, MongoClientURI)} instead
-     * @param conf the Configuration
-     * @param uri the MongoURI
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static void setInputURI(final Configuration conf, final MongoURI uri) {
-        setMongoURI(conf, INPUT_URI, uri);
-    }
-
-    /**
      * Set the input URI for the job.
      * @param conf the Configuration
      * @param uri the MongoDB URI
@@ -604,17 +539,6 @@ public final class MongoConfigUtil {
 
     public static void setOutputURI(final Configuration conf, final String uri) {
         setMongoURIString(conf, OUTPUT_URI, uri);
-    }
-
-    /**
-     * @deprecated use {@link #setOutputURI(Configuration, MongoClientURI)} instead
-     * @param conf the Configuration
-     * @param uri the MongoDB URI
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static void setOutputURI(final Configuration conf, final MongoURI uri) {
-        setMongoURI(conf, OUTPUT_URI, uri);
     }
 
     /**
@@ -1099,7 +1023,7 @@ public final class MongoConfigUtil {
         return newConf;
     }
 
-    public static void close(final Mongo client) {
+    public static void close(final MongoClient client) {
             MongoClientURI uri = URI_MAP.get().remove(client);
             if (uri != null) {
                 MongoClient remove;

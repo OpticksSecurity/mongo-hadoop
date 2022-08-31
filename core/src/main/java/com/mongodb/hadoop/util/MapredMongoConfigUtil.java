@@ -20,7 +20,6 @@ package com.mongodb.hadoop.util;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoURI;
 import com.mongodb.hadoop.splitter.MongoSplitter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.PathFilter;
@@ -452,18 +451,6 @@ public final class MapredMongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #getMongoClientURI(Configuration, String)} instead
-     * @param conf the Configuration
-     * @param key the key for the setting
-     * @return the MongoURI stored for the given key
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static MongoURI getMongoURI(final Configuration conf, final String key) {
-        return MongoConfigUtil.getMongoURI(conf, key);
-    }
-
-    /**
      * Retrieve a setting as a {@code MongoClientURI}.
      * @param conf the Configuration
      * @param key the key for the setting
@@ -486,33 +473,12 @@ public final class MapredMongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #getCollection(MongoClientURI)}
-     * @param uri the MongoDB URI
-     * @return the DBCollection in the URI
-     */
-    @Deprecated
-    public static DBCollection getCollection(final MongoURI uri) {
-        return MongoConfigUtil.getCollection(uri);
-    }
-
-    /**
      * Retrieve a DBCollection from a MongoDB URI.
      * @param uri the MongoDB URI
      * @return the DBCollection in the URI
      */
     public static DBCollection getCollection(final MongoClientURI uri) {
         return MongoConfigUtil.getCollection(uri);
-    }
-
-    /**
-     * @deprecated use {@link #getCollectionWithAuth(MongoClientURI, MongoClientURI)} instead
-     * @param authURI the URI with which to authenticate
-     * @param uri the MongoDB URI
-     * @return the authenticated DBCollection
-     */
-    @Deprecated
-    public static DBCollection getCollectionWithAuth(final MongoURI uri, final MongoURI authURI) {
-        return MongoConfigUtil.getCollectionWithAuth(uri, authURI);
     }
 
     /**
@@ -531,17 +497,6 @@ public final class MapredMongoConfigUtil {
 
     public static DBCollection getInputCollection(final Configuration conf) {
         return MongoConfigUtil.getInputCollection(conf);
-    }
-
-    /**
-     * @deprecated use {@link #setMongoURI(Configuration, String, MongoClientURI)} instead
-     * @param conf the Configuration
-     * @param key the key for the setting
-     * @param value the value for the setting
-     */
-    @Deprecated
-    public static void setMongoURI(final Configuration conf, final String key, final MongoURI value) {
-        MongoConfigUtil.setMongoURI(conf, key, value);
     }
 
     /**
@@ -567,17 +522,6 @@ public final class MapredMongoConfigUtil {
     }
 
     /**
-     * @deprecated use {@link #setInputURI(Configuration, MongoClientURI)} instead
-     * @param conf the Configuration
-     * @param uri the MongoURI
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static void setInputURI(final Configuration conf, final MongoURI uri) {
-        MongoConfigUtil.setInputURI(conf, uri);
-    }
-
-    /**
      * Set the input URI for the job.
      * @param conf the Configuration
      * @param uri the MongoDB URI
@@ -595,17 +539,6 @@ public final class MapredMongoConfigUtil {
     }
 
     public static void setOutputURI(final Configuration conf, final String uri) {
-        MongoConfigUtil.setOutputURI(conf, uri);
-    }
-
-     /**
-     * @deprecated use {@link #setOutputURI(Configuration, MongoClientURI)} instead
-      * @param conf the Configuration
-      * @param uri the MongoDB URI
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static void setOutputURI(final Configuration conf, final MongoURI uri) {
         MongoConfigUtil.setOutputURI(conf, uri);
     }
 
@@ -720,7 +653,7 @@ public final class MapredMongoConfigUtil {
     }
 
     public static boolean isRangeQueryEnabled(final Configuration conf) {
-        return conf.getBoolean(MongoConfigUtil.SPLITS_USE_RANGEQUERY, false);
+        return conf.getBoolean(MongoConfigUtil.SPLITS_USE_RANGEQUERY, true);
     }
 
     /**

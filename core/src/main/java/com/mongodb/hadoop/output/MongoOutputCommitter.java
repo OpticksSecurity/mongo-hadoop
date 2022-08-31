@@ -229,7 +229,7 @@ public class MongoOutputCommitter extends OutputCommitter {
         }
 
         if (collection != null) {
-            MongoConfigUtil.close(collection.getDB().getMongo());
+            MongoConfigUtil.close(collection.getDB().getMongoClient());
         }
     }
 

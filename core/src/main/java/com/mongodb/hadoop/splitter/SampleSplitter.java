@@ -1,6 +1,7 @@
 package com.mongodb.hadoop.splitter;
 
-import com.mongodb.AggregationOutput;
+import com.mongodb.AggregationOptions;
+import com.mongodb.Cursor;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.CommandResult;
@@ -76,10 +77,10 @@ public class SampleSplitter extends MongoCollectionSplitter {
           new BasicDBObject("$sort", splitKey)
         };
 
-        AggregationOutput aggregationOutput;
+        Cursor aggregationOutput;
         try {
             aggregationOutput =
-              inputCollection.aggregate(Arrays.asList(pipeline));
+              inputCollection.aggregate(Arrays.asList(pipeline), AggregationOptions.builder().build());
         } catch (MongoException e) {
             throw new SplitFailedException(
               "Failed to aggregate sample documents. Note that this Splitter "
@@ -90,7 +91,8 @@ public class SampleSplitter extends MongoCollectionSplitter {
         BasicDBObject previousKey = null;
         List<InputSplit> splits = new ArrayList<InputSplit>(numSplits);
         int i = 0;
-        for (DBObject sample : aggregationOutput.results()) {
+        while (aggregationOutput.hasNext()) {
+            DBObject sample = aggregationOutput.next();
             if (i++ % samplesPerSplit == 0) {
                 BasicDBObject bdbo = (BasicDBObject) sample;
                 splits.add(createSplitFromBounds(previousKey, bdbo));

@@ -61,7 +61,7 @@ public class BSONLoader implements Iterable<BSONObject>, Iterator<BSONObject> {
         byte[] l = new byte[4];
         try {
             input.readFully(l);
-            nextLen = org.bson.io.Bits.readInt(l);
+            nextLen = Bits.readInt(l);
             nextHdr = l;
             hasMore.set(true);
         } catch (Exception e) {

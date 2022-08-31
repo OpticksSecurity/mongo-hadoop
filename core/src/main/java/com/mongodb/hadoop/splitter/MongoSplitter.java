@@ -60,7 +60,7 @@ public abstract class MongoSplitter {
                 results.add(mis);
             } else {
                 MongoConfigUtil.close(
-                  mis.getCursor().getCollection().getDB().getMongo());
+                  mis.getCursor().getCollection().getDB().getMongoClient());
             }
         }
         return results;

@@ -1,7 +1,6 @@
 package com.mongodb.hadoop;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -30,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
@@ -60,9 +60,9 @@ public class GridFSInputFormatTest extends BaseHadoopTest {
 
     private static void cleanFile(final String filename) {
         bucket.find(new Document("filename", filename)).forEach(
-          new Block<GridFSFile>() {
+          new Consumer<GridFSFile>() {
               @Override
-              public void apply(final GridFSFile gridFSFile) {
+              public void accept(final GridFSFile gridFSFile) {
                   bucket.delete(gridFSFile.getObjectId());
               }
           }

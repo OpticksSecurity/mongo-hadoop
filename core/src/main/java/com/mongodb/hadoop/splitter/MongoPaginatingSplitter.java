@@ -2,7 +2,6 @@ package com.mongodb.hadoop.splitter;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Bytes;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -89,7 +88,7 @@ public class MongoPaginatingSplitter extends MongoCollectionSplitter {
                     cursor = inputCollection.find(rangeObj, splitKeyProjection);
                 }
                 cursor = cursor.sort(splitKeyObj).skip(minDocs).limit(1)
-                  .setOptions(Bytes.QUERYOPTION_NOTIMEOUT);
+                  .noCursorTimeout(true);
 
                 if (cursor.hasNext()) {
                     maxBound = cursor.next().get(splitKey);
@@ -110,7 +109,7 @@ public class MongoPaginatingSplitter extends MongoCollectionSplitter {
                 minBound = maxBound;
             } while (maxBound != null);
         } finally {
-            MongoConfigUtil.close(inputCollection.getDB().getMongo());
+            MongoConfigUtil.close(inputCollection.getDB().getMongoClient());
         }
 
         return splits;

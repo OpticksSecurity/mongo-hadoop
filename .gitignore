@@ -15,6 +15,7 @@
 .gradle
 .idea
 .project
+.vscode
 TempStatsStore/
 WDI_GDF_Data.csv
 bin/hadoop-all.sh
@@ -29,3 +30,5 @@ tags
 target
 test-*.out
 hadoop-binaries
+bin/
+docs/

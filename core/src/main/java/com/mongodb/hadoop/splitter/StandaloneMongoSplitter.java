@@ -198,7 +198,7 @@ public class StandaloneMongoSplitter extends MongoCollectionSplitter {
             returnVal.add(lastSplit);
         } finally {
             if (inputCollection != null) {
-                MongoConfigUtil.close(inputCollection.getDB().getMongo());
+                MongoConfigUtil.close(inputCollection.getDB().getMongoClient());
             }
         }
 

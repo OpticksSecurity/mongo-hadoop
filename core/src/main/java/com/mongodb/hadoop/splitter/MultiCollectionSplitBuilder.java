@@ -20,7 +20,6 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoURI;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.mongodb.util.JSON;
 
@@ -39,26 +38,6 @@ public class MultiCollectionSplitBuilder {
     public MultiCollectionSplitBuilder addConf(final CollectionSplitterConf conf) {
         collectionSplitters.add(conf);
         return this;
-    }
-
-    /**
-     * @deprecated Use {@link #add(MongoClientURI, MongoClientURI, boolean, DBObject, DBObject, DBObject, boolean, Class)}
-     * @param inputURI the input URI for the collection
-     * @param authURI the URI to use for authenticating to the collection
-     * @param noTimeout disables timing out when reading
-     * @param fields a projection specification
-     * @param sort a sort specification
-     * @param query a query specification
-     * @param useRangeQuery enables using a range query
-     * @param splitClass the InputSplit class to use
-     * @return the builder
-     */
-    @Deprecated
-    public MultiCollectionSplitBuilder add(final MongoURI inputURI, final MongoURI authURI, final boolean noTimeout, final DBObject fields,
-                                           final DBObject sort, final DBObject query, final boolean useRangeQuery,
-                                           final Class<? extends MongoSplitter> splitClass) {
-        return add(new MongoClientURI(inputURI.toString()), new MongoClientURI(authURI.toString()),
-                   noTimeout, fields, sort, query, useRangeQuery, splitClass);
     }
 
     /**

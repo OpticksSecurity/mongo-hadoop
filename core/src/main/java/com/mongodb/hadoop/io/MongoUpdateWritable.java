@@ -28,7 +28,7 @@ import org.bson.BasicBSONDecoder;
 import org.bson.BasicBSONEncoder;
 import org.bson.BasicBSONObject;
 import org.bson.io.BasicOutputBuffer;
-import org.bson.io.Bits;
+import com.mongodb.hadoop.util.Bits;
 
 import java.io.DataInput;
 import java.io.DataOutput;

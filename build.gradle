@@ -7,7 +7,7 @@ apply plugin: 'com.github.ben-manes.versions'
 
 ext.configDir = new File(rootDir, 'config')
 ext.hadoopBinaries = "${rootDir}/hadoop-binaries".toString()
-ext.javaDriverVersion = '3.2.1'
+ext.javaDriverVersion = '4.4.1'
 ext.hiveVersion = System.getenv("HIVE_VERSION") ?: '1.2.1'
 ext.pigVersion = System.getenv("PIG_VERSION") ?: '0.15.0'
 ext.hadoopVersion = System.getenv("HADOOP_VERSION") ?: '2.7.2'
@@ -49,16 +49,12 @@ buildscript {
 apply from: 'gradle/functions.gradle'
 apply from: 'gradle/hadoop.gradle'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
-}
-
 if(project.hasProperty("clusterVersion")) {
     println "The cluster version property has been obsoleted.  See https://jira.mongodb.org/browse/HADOOP-160 for details."
 }
 
 allprojects {
-    version = '2.0.2'
+    version = '2.0.2.1'
     group = 'org.mongodb.mongo-hadoop'
 }
 
@@ -95,7 +91,7 @@ configure(subprojects) {
 */
 
     dependencies {
-        compile "org.mongodb:mongo-java-driver:${javaDriverVersion}"
+        compile "org.mongodb:mongodb-driver-legacy:${javaDriverVersion}"
 
         testCompile 'junit:junit:4.11'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
@@ -164,7 +160,7 @@ configure(subprojects) {
         classpath += configurations.compile
     }
 
-    task quickCheck(dependsOn: [checkstyleMain, checkstyleTest] ) << {}
+    task quickCheck(dependsOn: [checkstyleMain, checkstyleTest] ) { doLast {} }
 
     findbugs {
         excludeFilter = new File("$configDir/findbugs-exclude.xml")
@@ -197,7 +193,7 @@ configure(subprojects) {
 //    }
 
     test {
-        dependsOn 'jar', 'testsJar', ':startCluster', ':downloadEnronEmails'
+        dependsOn 'jar', 'testsJar', ':startCluster' //, ':downloadEnronEmails'
     }
 
     modifyPom {
@@ -311,7 +307,7 @@ project(":core") {
     }
 }
 
-project(':spark') {
+/*project(':spark') {
     apply plugin: 'scala'
     archivesBaseName = "mongo-hadoop-spark"
     dependencies {
@@ -337,7 +333,7 @@ project(':spark') {
     test {
         dependsOn.remove('testsJar')
     }
-}
+}*/
 
 project(':hive') {
     archivesBaseName = 'mongo-hadoop-hive'
@@ -369,9 +365,29 @@ project(':hive') {
             exclude group: 'org.apache.hadoop', module: 'hadoop-core'
         }
     }
+
+    //def mainProjects = [':core',':hive']
+    //task fatJar(type: Jar, dependsOn: mainProjects.collect{ it+":compileJava" }) {
+    task fatJar(type: Jar) {
+        baseName = 'mongo-hive'
+        //archiveClassifier = "all"
+
+        manifest { 
+            //attributes "Main-Class": "$mainClassName"
+        }  
+
+        from {
+            //configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+            configurations.runtimeClasspath.findResults { it.isDirectory() ? it : (!(it.name ==~ /.*(mongo|bson).*/) ? null : zipTree(it)) }
+            //files(mainProjects.collect{ project(it).sourceSets.main.output })
+        }
+
+        with jar
+    }
 }
 
-project(":pig") {
+
+/*project(":pig") {
     archivesBaseName = "mongo-hadoop-pig"
 
     dependencies {
@@ -497,7 +513,7 @@ project(":examples/shakespeare") {
     dependencies {
         compile project(":core")
     }
-}
+}*/
 
 task cleanLogs(type: Delete) {
     delete fileTree(dir: "logs", exclude: ".keep")

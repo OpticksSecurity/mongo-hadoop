@@ -35,30 +35,30 @@ def extract(destination, target, file) {
     }
 }
 
-task installHadoop() << {
+task installHadoop() { doLast {
     extract(hadoopBinaries, hadoopHome,
             downloadFile("http://archive.apache.org/dist/hadoop/common/hadoop-${hadoopVersion}/hadoop-${hadoopVersion}.tar.gz"))
-}
+} }
 
-task installHive() << {
+task installHive() { doLast {
     extract(hadoopBinaries, hiveHome,
             downloadFile("https://archive.apache.org/dist/hive/hive-${hiveVersion}/apache-hive-${hiveVersion}-bin.tar.gz"))
-}
+} }
 
-task installPig() << {
+task installPig() { doLast {
     extract(hadoopBinaries, pigHome, downloadFile("https://archive.apache.org/dist/pig/pig-${pigVersion}/pig-${pigVersion}.tar.gz"))
-}
+} }
 
-task downloadEnronEmails() << {
+task downloadEnronEmails() { doLast {
     extract(dataHome, dataHome, downloadFile('https://s3.amazonaws.com/mongodb-enron-email/enron_mongo.tar.bz2'))
-}
+} }
 
-task downloadShakespeare() << {
+task downloadShakespeare() { doLast {
     // Download complete works from Project Gutenberg.
     downloadFile('http://www.gutenberg.org/cache/epub/100/pg100.txt')
-}
+} }
 
-task copyFiles(dependsOn: [installHadoop, installHive, installPig]) << {
+task copyFiles(dependsOn: [installHadoop, installHive, installPig]) { doLast {
     def hadoopEtc
     def hadoopLib
     if (isHadoopV1) {
@@ -93,7 +93,7 @@ task copyFiles(dependsOn: [installHadoop, installHive, installPig]) << {
                 HIVE_HOME: hiveHome.toString()
         ]
     }
-}
+} }
 
 def findJar(String proj, String filter) {
     project(proj).configurations.compile.find { it.name.startsWith(filter) }

@@ -78,7 +78,7 @@ public final class MongoSplitterFactory {
                 buildInfo = coll.getDB().command("buildinfo");
             } finally {
                 if (coll != null) {
-                    MongoConfigUtil.close(coll.getDB().getMongo());
+                    MongoConfigUtil.close(coll.getDB().getMongoClient());
                 }
             }
 

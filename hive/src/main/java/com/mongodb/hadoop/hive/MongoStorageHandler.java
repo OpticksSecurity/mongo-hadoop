@@ -37,7 +37,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.Deserializer;
-import org.apache.hadoop.hive.serde2.SerDe;
+import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputFormat;
@@ -84,7 +84,7 @@ public class MongoStorageHandler extends DefaultStorageHandler
     }
 
     @Override
-    public Class<? extends SerDe> getSerDeClass() {
+    public Class<? extends AbstractSerDe> getSerDeClass() {
         return BSONSerDe.class;
     }
 
@@ -197,7 +197,7 @@ public class MongoStorageHandler extends DefaultStorageHandler
                 try {
                     coll.drop();
                 } finally {
-                    MongoConfigUtil.close(coll.getDB().getMongo());
+                    MongoConfigUtil.close(coll.getDB().getMongoClient());
                 }
             }
         }

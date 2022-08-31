@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde.serdeConstants;
-import org.apache.hadoop.hive.serde2.SerDe;
+import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
@@ -62,7 +62,7 @@ import static java.lang.String.format;
  * The BSONSerDe class deserializes (parses) and serializes object from BSON to Hive represented object. It's initialized with the hive
  * columns and hive recognized types as well as other config variables mandated by the StorageHanders.
  */
-public class BSONSerDe implements SerDe {
+public class BSONSerDe extends AbstractSerDe {
     private static final Log LOG = LogFactory.getLog(BSONSerDe.class);
 
     // stores the 1-to-1 mapping of MongoDB fields to hive columns
@@ -490,19 +490,21 @@ public class BSONSerDe implements SerDe {
 
 
     public Object serializeObject(final Object obj, final ObjectInspector oi, final String ext) {
-        switch (oi.getCategory()) {
-            case LIST:
-                return serializeList(obj, (ListObjectInspector) oi, ext);
-            case MAP:
-                return serializeMap(obj, (MapObjectInspector) oi, ext);
-            case PRIMITIVE:
-                return serializePrimitive(obj, (PrimitiveObjectInspector) oi);
-            case STRUCT:
-                return serializeStruct(obj, (StructObjectInspector) oi, ext);
-            case UNION:
-            default:
-                LOG.error("Cannot serialize " + obj + " of type " + obj);
-                break;
+        if (obj != null) {
+            switch (oi.getCategory()) {
+                case LIST:
+                    return serializeList(obj, (ListObjectInspector) oi, ext);
+                case MAP:
+                    return serializeMap(obj, (MapObjectInspector) oi, ext);
+                case PRIMITIVE:
+                    return serializePrimitive(obj, (PrimitiveObjectInspector) oi);
+                case STRUCT:
+                    return serializeStruct(obj, (StructObjectInspector) oi, ext);
+                case UNION:
+                default:
+                    LOG.error("Cannot serialize " + obj + " of type " + obj);
+                    break;
+            }
         }
         return null;
     }
@@ -625,10 +627,15 @@ public class BSONSerDe implements SerDe {
         ObjectInspector mapValOI = mapOI.getMapValueObjectInspector();
 
         // Each value is guaranteed to be of the same type
-        for (Entry<?, ?> entry : mapOI.getMap(obj).entrySet()) {
-            String field = entry.getKey().toString();
-            Object value = serializeObject(entry.getValue(), mapValOI, ext);
-            bsonObject.put(field, value);
+        if (mapOI != null) {
+            Map<?, ?> map = mapOI.getMap(obj);
+            if (map != null) {
+                for (Entry<?, ?> entry : map.entrySet()) {
+                    String field = entry.getKey().toString();
+                    Object value = serializeObject(entry.getValue(), mapValOI, ext);
+                    bsonObject.put(field, value);
+                }
+            }
         }
         return bsonObject;
     }

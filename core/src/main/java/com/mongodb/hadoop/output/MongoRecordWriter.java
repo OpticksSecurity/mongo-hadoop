@@ -84,7 +84,7 @@ public class MongoRecordWriter<K, V> extends RecordWriter<K, V> {
                 LOG.error("Could not close output stream", e);
             }
         }
-        MongoConfigUtil.close(collection.getDB().getMongo());
+        MongoConfigUtil.close(collection.getDB().getMongoClient());
     }
 
     @Override
